@@ -11,11 +11,11 @@ import {
   ToastAndroid,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../lib/queryClient";
 import { MobilePaymentFields } from "./MobilePaymentFields";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 interface OrderItem {
   name: string;
@@ -33,12 +33,17 @@ interface Order {
   status: string;
 }
 
-interface CheckoutFormProps {
-  orderId: string;
-}
+// --- Define navigation stack params ---
+type RootStackParamList = {
+  CheckoutForm: { orderId: string };
+  Home: undefined;
+  PayNowWebview: { url: string };
+};
 
-export const CheckoutForm = ({ orderId }: CheckoutFormProps) => {
-  const navigation = useNavigation();
+type Props = NativeStackScreenProps<RootStackParamList, "CheckoutForm">;
+
+export const CheckoutForm: React.FC<Props> = ({ route, navigation }) => {
+  const { orderId } = route.params;
 
   const [paymentMethod, setPaymentMethod] = useState<"web" | "mobile" | "voucher">("web");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -116,19 +121,20 @@ export const CheckoutForm = ({ orderId }: CheckoutFormProps) => {
       if (paymentMethod === "voucher" && data.status === "paid_with_voucher") {
         ToastAndroid.show("Paid with Voucher", ToastAndroid.SHORT);
         queryClient.invalidateQueries({ queryKey: [`order-${orderId}`] });
-        navigation.navigate("Home" as never);
+        navigation.navigate("Home");
         return;
       }
 
       if (data.paynow_url) {
         ToastAndroid.show("Redirecting to PayNow...", ToastAndroid.SHORT);
-        // You could use a WebView here to open PayNow URL
+        // Open PayNow inside WebView screen
+        navigation.navigate("PayNowWebview", { url: data.paynow_url });
         return;
       }
 
       if (data.status === "paid" || data.status === "Payment Successful") {
         ToastAndroid.show("Payment Successful", ToastAndroid.SHORT);
-        navigation.navigate("Home" as never);
+        navigation.navigate("Home");
       } else {
         ToastAndroid.show("Payment Failed", ToastAndroid.SHORT);
       }
@@ -155,7 +161,7 @@ export const CheckoutForm = ({ orderId }: CheckoutFormProps) => {
     },
     onSuccess: (data) => {
       ToastAndroid.show("Redirecting to PayNow...", ToastAndroid.SHORT);
-      // Handle PayNow redirect via WebView
+      navigation.navigate("PayNowWebview", { url: data.paynow_url });
     },
   });
 
@@ -232,8 +238,7 @@ export const CheckoutForm = ({ orderId }: CheckoutFormProps) => {
       {paymentMethod === "voucher" && (
         <View style={styles.section}>
           <Text>
-            Feast Voucher Balance:{" "}
-            {voucherBalance !== null ? `$${voucherBalance.toFixed(2)}` : "Loading..."}
+            Feast Voucher Balance: {voucherBalance !== null ? `$${voucherBalance.toFixed(2)}` : "Loading..."}
           </Text>
           <TextInput
             style={styles.input}
@@ -259,21 +264,14 @@ export const CheckoutForm = ({ orderId }: CheckoutFormProps) => {
         onPress={handleSubmit}
         disabled={isProcessing}
       >
-        {isProcessing ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Pay ${totalAmount.toFixed(2)}</Text>
-        )}
+        {isProcessing ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Pay ${totalAmount.toFixed(2)}</Text>}
       </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: "#fff",
-  },
+  container: { padding: 20, backgroundColor: "#fff" },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 8 },
   subtitle: { fontSize: 16, color: "#666", marginBottom: 16 },
@@ -282,24 +280,8 @@ const styles = StyleSheet.create({
   info: { fontSize: 14, marginTop: 4 },
   field: { marginBottom: 16 },
   label: { fontSize: 14, fontWeight: "500", marginBottom: 6 },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 10,
-    marginTop: 8,
-  },
-  button: {
-    backgroundColor: "#1E40AF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
+  pickerWrapper: { borderWidth: 1, borderColor: "#ccc", borderRadius: 6 },
+  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 6, padding: 10, marginTop: 8 },
+  button: { backgroundColor: "#1E40AF", padding: 15, borderRadius: 8, alignItems: "center", marginTop: 10 },
   buttonText: { color: "#fff", fontWeight: "600" },
 });

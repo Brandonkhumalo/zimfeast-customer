@@ -1,3 +1,4 @@
+// App.tsx
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -13,23 +14,13 @@ import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/not-found";
+import { PayNowWebview } from "./pages/checkout-components/PayNowWebview";
 
-type RootStackParamList = {
-  Landing: undefined;
-  Login: undefined;
-  Register: undefined;
-  Home: undefined;
-  Customer: undefined;
-  Admin: undefined;
-  Checkout: undefined;
-  NotFound: undefined;
-};
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator();
 
 interface PrivateRouteProps {
   component: React.FC<any>;
-  allowedRoles?: Array<"customer" |  "admin">;
+  allowedRoles?: Array<"customer" | "admin">;
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ component: Component, allowedRoles }) => {
@@ -75,6 +66,9 @@ export default function App() {
           </Stack.Screen>
           <Stack.Screen name="Checkout">
             {() => <PrivateRoute component={Checkout} />}
+          </Stack.Screen>
+          <Stack.Screen name="PayNowWebview">
+            {() => <PrivateRoute component={PayNowWebview} />}
           </Stack.Screen>
 
           {/* Fallback */}

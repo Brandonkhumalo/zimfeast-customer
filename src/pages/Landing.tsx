@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { TouchableOpacity, Text, Linking, View, ScrollView, StyleSheet } from "react-native";
 
 // Simple Card wrapper for features/partners
 const Card = ({ children, style }: { children: React.ReactNode; style?: object }) => (
@@ -92,9 +92,8 @@ export default function Landing() {
           </Card>
         ))}
         <TouchableOpacity
-          onPress={() => navigation.navigate("tishanyq.co.zw")}
-          style={styles.joinBtn}
-        >
+          onPress={() => Linking.openURL("https://tishanyq.co.zw")}
+          style={styles.joinBtn}>
           <Text style={styles.joinBtnText}>Join Business Hub</Text>
         </TouchableOpacity>
       </View>

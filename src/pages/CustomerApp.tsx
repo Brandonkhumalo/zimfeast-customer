@@ -106,7 +106,7 @@ export default function CustomerApp({ navigation }: any) {
   return (
     <View style={styles.container}>
       <Navbar />
-      <ScrollView>
+      <ScrollView>np
         <Header
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
