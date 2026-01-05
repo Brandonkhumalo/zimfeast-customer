@@ -1,109 +1,102 @@
 # ZimFeast Customer App
 
 ## Overview
-ZimFeast is a React Native mobile application built with Expo for food delivery services in Zimbabwe. The app allows customers to browse restaurants, place orders, and track deliveries.
+ZimFeast is a food delivery mobile application for Zimbabwe. The app allows customers to browse restaurants, place orders, make payments, and track deliveries.
 
-## Recent Changes (October 14, 2025)
-- Configured project for mobile development using Expo
-- Removed web configuration, focused on iOS and Android platforms
-- Set up Expo dev server with LAN mode for local network access
-- Updated TypeScript configuration for React Native
-- Installed necessary dependencies including @expo/ngrok for tunneling support
+## Recent Changes
+- **January 2026**: Complete migration from React Native/Expo to native Android Java
+  - Created full Android Studio project structure
+  - Implemented all screens: Landing, Login, Register, Customer browsing, Cart, Checkout, Order Tracking
+  - Integrated Retrofit for API communication
+  - Added Room database for local cart persistence
+  - Implemented PayNow payment integration (web and mobile)
+  - Deleted all React Native code
 
 ## Project Architecture
 
 ### Technology Stack
-- **Framework**: React Native with Expo SDK 54
-- **Language**: TypeScript
-- **Navigation**: React Navigation (Native Stack)
-- **State Management**: TanStack React Query
-- **Styling**: NativeWind (Tailwind CSS for React Native)
-- **UI Components**: Custom UI components with shadcn/ui-inspired design
+- **Language**: Java
+- **Platform**: Native Android (Android Studio)
+- **Min SDK**: 24 (Android 7.0)
+- **Target SDK**: 34 (Android 14)
 
 ### Project Structure
 ```
-src/
-├── components/        # Reusable UI components
-│   ├── ui/           # Base UI components (buttons, cards, etc.)
-│   ├── Cart.tsx
-│   ├── Navbar.tsx
-│   └── RestaurantCard.tsx
-├── pages/            # Screen components
-│   ├── Landing.tsx
-│   ├── Login.tsx
-│   ├── RegisterPage.tsx
-│   ├── Home.tsx
-│   ├── CustomerApp.tsx
-│   └── Checkout.tsx
-├── hooks/            # Custom React hooks
-├── lib/              # Utility functions and configurations
-└── App.tsx           # Main app component with navigation setup
+android/
+├── app/src/main/
+│   ├── java/com/zimfeast/customer/
+│   │   ├── ZimFeastApplication.java     # Application class
+│   │   ├── data/
+│   │   │   ├── api/                     # Retrofit API client
+│   │   │   ├── local/                   # Room database
+│   │   │   └── model/                   # Data models
+│   │   ├── ui/
+│   │   │   ├── landing/                 # Landing screen
+│   │   │   ├── auth/                    # Login/Register
+│   │   │   ├── customer/                # Restaurant browsing
+│   │   │   ├── cart/                    # Shopping cart
+│   │   │   ├── checkout/                # Payment processing
+│   │   │   └── tracking/                # Order tracking
+│   │   └── util/                        # Utilities
+│   └── res/                             # Resources (layouts, drawables, etc.)
+├── build.gradle
+└── settings.gradle
 ```
 
-### Backend Integration
-The app connects to a backend API at http://192.168.1.9:8000 with the following endpoints:
-- `/api/accounts/login/` - User authentication
-- `/api/accounts/register/` - User registration
-- `/api/accounts/profile/` - User profile
-- `/api/restaurants/` - Restaurant listings
-- `/api/orders/` - Order management
-- `/api/payments/` - Payment processing
+### Key Components
 
-**Important Note**: The API URLs are configured to connect to the backend at 192.168.1.9:8000 (user's backend server on local network).
+#### Data Layer
+- **ApiClient.java**: Retrofit configuration with JWT interceptor
+- **ApiService.java**: API endpoint definitions
+- **TokenManager.java**: Secure token storage using EncryptedSharedPreferences
+- **AppDatabase.java**: Room database for cart persistence
+- **CartDao.java**: Data access object for cart operations
 
-## Running the App
+#### UI Layer
+- **LandingActivity**: Welcome screen with app features
+- **LoginActivity / RegisterActivity**: User authentication
+- **CustomerActivity**: Main screen with restaurant browsing, search, filters
+- **CartActivity**: Shopping cart management
+- **CheckoutActivity**: Payment method selection and processing
+- **PayNowWebViewActivity**: WebView for PayNow web payments
+- **OrderTrackingActivity**: Real-time order status tracking
 
-### Development Server
-The app runs using Expo's development server:
-```bash
-npm start
-```
+#### Utilities
+- **DeliveryUtils.java**: Delivery fee calculation using Haversine formula
 
-This will:
-1. Start Metro bundler
-2. Generate a QR code
-3. Make the app available on your local network
+### Dependencies
+- AndroidX AppCompat & Material Components
+- Retrofit 2.9.0 for API calls
+- OkHttp 4.12.0 with logging interceptor
+- Gson 2.10.1 for JSON parsing
+- Room 2.6.1 for local database
+- Glide 4.16.0 for image loading
+- Google Play Services (Location & Maps)
+- Security Crypto for encrypted preferences
 
-### Connecting from Mobile Device
+### Backend API
+The app connects to a backend at `http://192.168.1.9:8000/`
 
-#### Option 1: Expo Go (Recommended for Development)
-1. Install Expo Go app on your phone from App Store (iOS) or Play Store (Android)
-2. Make sure your phone is on the same WiFi network as your development machine
-3. Scan the QR code displayed in the console with:
-   - **iOS**: Camera app (will open Expo Go)
-   - **Android**: Expo Go app's built-in scanner
-
-#### Option 2: Development Build
-Run platform-specific commands:
-- Android: `npm run android`
-- iOS: `npm run ios` (requires macOS with Xcode)
-
-### Important Configuration Notes
-
-1. **Network Access**: The dev server uses `--lan` mode, which works when your phone and computer are on the same network.
-
-2. **API Endpoints**: Update API URLs in the following files if your backend is not on localhost:
-   - `src/components/Navbar.tsx`
-   - `src/hooks/useAuth.ts`
-   - `src/pages/RegisterPage.tsx`
-   - `src/components/Cart.tsx`
-   - `src/pages/checkout-components/CheckoutForm.tsx`
-   - `src/pages/customer-components/CartComponent.tsx`
-   - `src/pages/customer-components/TopRestaurants.tsx`
-
-3. **Environment Variables**: For Google Maps API and other services, you may need to set up environment variables.
-
-## Package Compatibility Notes
-The project uses:
-- React Native 0.81.4 (requires Node >= 20.19.4, currently using 20.19.3)
-- Some packages show engine warnings but should work correctly
-- Consider updating `@react-native-picker/picker` and `babel-preset-expo` for best Expo 54 compatibility
+Key endpoints:
+- `POST /api/accounts/login/` - Login
+- `POST /api/accounts/register/` - Register
+- `GET /api/restaurants/` - Get restaurants
+- `POST /api/orders/` - Create order
+- `POST /api/payments/create/payment/` - Process payment
 
 ## User Preferences
-- Mobile-first development focus
-- Keep all backend API URLs unchanged (user will handle backend configuration separately)
-- No web version - iOS and Android only
+- Currency: USD or ZWL
+- Location-based restaurant filtering
 
-## Known Issues
-- Some package version mismatches with Expo 54 (see console warnings)
-- Backend API URLs point to localhost - needs updating for mobile device access
+## Build Instructions
+1. Download the `android` folder
+2. Open in Android Studio
+3. Sync Gradle files
+4. Update `BASE_URL` in `ApiClient.java` if needed
+5. Add Google Maps API key in `AndroidManifest.xml` (optional)
+6. Build and run on emulator or device
+
+## Notes
+- This is a native Android project, not compatible with Expo/React Native
+- Requires Android Studio with Android SDK to build
+- The project uses View Binding for type-safe view access

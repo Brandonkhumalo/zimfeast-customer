@@ -15,18 +15,18 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Expo Dev Server"
+args = "Android Project Info"
 
 [[workflows.workflow]]
-name = "Expo Dev Server"
+name = "Android Project Info"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm start"
+args = "echo \"ZimFeast Android Project\" && echo \"========================\" && echo \"\" && echo \"This is a native Android Studio project that needs to be built locally.\" && echo \"\" && echo \"To build and run:\" && echo \"1. Download the 'android' folder to your local machine\" && echo \"2. Open it in Android Studio\" && echo \"3. Sync Gradle files\" && echo \"4. Build and run on an emulator or device\" && echo \"\" && echo \"Project structure:\" && find android -type f -name \"*.java\" | head -20 && echo \"\" && echo \"See android/README.md for full documentation.\""
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[ports]]
 localPort = 8081
