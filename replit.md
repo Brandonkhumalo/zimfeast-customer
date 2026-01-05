@@ -22,7 +22,6 @@ ZimFeast is a food delivery mobile application for Zimbabwe. The app allows cust
 
 ### Project Structure
 ```
-android/
 ├── app/src/main/
 │   ├── java/com/zimfeast/customer/
 │   │   ├── ZimFeastApplication.java     # Application class
@@ -89,7 +88,7 @@ Key endpoints:
 - Location-based restaurant filtering
 
 ## Build Instructions
-1. Download the `android` folder
+1. Download this project
 2. Open in Android Studio
 3. Sync Gradle files
 4. Update `BASE_URL` in `ApiClient.java` if needed
